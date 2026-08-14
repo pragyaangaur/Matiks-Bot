@@ -1,0 +1,61 @@
+# Everything here has a default in matiks_bot/config.py — you only need to
+# override what's wrong for your setup. Start by running `probe` and adjusting
+# the navigation labels to match the buttons you actually see.
+
+browser:
+  url: https://matiks.com
+  profile_dir: .browser-profile   # your login lives here; log in once by hand
+  headless: false                 # keep false: you need to see what it's doing
+  viewport: {width: 1280, height: 900}
+  slow_mo_ms: 0
+
+navigation:
+  # Walked in order from the home page. Each row is a list of candidate labels;
+  # the first one that's visible gets clicked.
+  # These are the labels observed working against live Matiks.
+  to_game:
+    - [Math, MATH, Maths]
+    - [Sprint Duel, Sprint Duels, Duels]
+    - [Play, Play Duel, Start Duel]
+  play_again: [New Game, Play Again, Rematch, Play Duel, Next Game]
+  dismiss: [Close, Skip, Continue, OK]
+
+detect:
+  game_over_text: [play again, rematch, final score, you won, you lost, game over]
+  waiting_text: [finding opponent, waiting for opponent, matching]
+  # Prompts are large type. Timers ("0:47") and progress counters ("1/6") are
+  # small, and both parse as arithmetic — this is what keeps them out.
+  # The duel prompt renders at 24px, far smaller than the menus. 22 left no
+  # headroom, so this sits below it.
+  min_question_font_px: 18
+
+pacing:
+  # Each question takes a random time in this window, measured from when it
+  # appears to when the answer is submitted (typing included). Sampling per
+  # question is what breaks up the rhythm; an average rate does not.
+  response_min_s: 0.8
+  response_max_s: 1.2
+  # Used only by the android fallback, which has no per-question signal.
+  target_answers_per_min: 45
+  min_reaction_ms: 450
+  jitter_ms: 250
+  poll_interval_ms: 60
+  typing_delay_ms: 45
+
+run:
+  max_games: 0        # 0 = until you Ctrl-C
+  max_minutes: 0
+  submit_key: Enter   # set to null if the app submits on the last digit
+  # The duel's answer box. Stable across deploys; placeholder text, not a class.
+  answer_selector: 'input[placeholder="Enter answer"]'
+  clear_before_typing: true
+  stop_after_consecutive_errors: 15
+  # Open-ended runs give up after this long with nothing answered.
+  give_up_after_idle_s: 1800
+  # Consecutive faults with no progress before giving up.
+  max_loop_resumes: 10
+
+android:
+  question_region: null   # filled in by `calibrate`
+  keys: {}                # filled in by `calibrate`
+  tesseract_cmd: null     # e.g. /opt/homebrew/bin/tesseract

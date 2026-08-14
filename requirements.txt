@@ -1,0 +1,8 @@
+# Browser path (primary)
+playwright>=1.44
+pyyaml>=6.0
+
+# Android fallback only — skip these if you're using the browser path
+opencv-python>=4.9
+numpy>=1.26
+pytesseract>=0.3.10   # also needs the tesseract binary: brew install tesseract

@@ -1,0 +1,12 @@
+# Your Matiks session lives here — never commit it.
+.browser-profile/
+
+# Captured duel pages used to rebuild the glyph table; large and account-specific.
+captures/
+glyph_sheet.*
+logs/
+
+__pycache__/
+*.pyc
+.DS_Store
+.venv/
