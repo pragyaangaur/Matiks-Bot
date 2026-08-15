@@ -3,15 +3,13 @@
 A bot that plays the math mode of [Matiks](https://matiks.com): it reads the
 question off the screen, solves it, types the answer, and starts the next game.
 
-Measured against live Sprint Duels: **274 questions across 5 consecutive games,
-0 solve failures, ~49 answers/min**, restarting itself between games.
-
 > **Read this before running it.** Sprint Duels are ranked and matched against
 > real people. Automating them violates Matiks' terms, takes wins off human
 > opponents, and pollutes the leaderboard — and a perfect score at 60 answers a
 > minute is not subtle. Point it at solo or practice modes if you want to keep
 > your account. This exists because reverse-engineering how a page renders its
-> content is an interesting problem I wanted to demonstrate to the Matiks team, not because ruining someone else's match is.
+> content is an interesting problem I wanted to demonstrate to the Matiks team,
+> not because ruining someone else's match is.
 
 ---
 
@@ -39,8 +37,8 @@ The prompt is laid out as stacked vertical arithmetic:
 ```
 
 DOM order is reading order, so the tokens concatenate directly to `46+55`.
-Assembling by coordinates was tried first and silently produced `46+5` when one
-element's box collapsed to zero width. Order is exact; geometry is not.
+Assembling by coordinates was tried first and produced `46+5` when one
+element's box collapsed to zero width.
 
 Everything *else* on the page is ordinary text and is read normally — buttons,
 scores, the end screen, and the `<input placeholder="Enter answer">` box.
@@ -53,7 +51,7 @@ Two other things shape the code:
   their label text.
 - **Clicks are verified, not assumed.** A click that dispatches at the right
   coordinates without firing the button looks identical to success in a log.
-  That stalled the bot between games while it cheerfully reported
+  That stalled the bot between games while it reported
   `clicked 'New Game'`. Every consequential click now checks that the screen
   actually changed and falls back to another route if it didn't.
 
@@ -71,7 +69,7 @@ python3 -m matiks_bot.cli play --handoff --games 0 --minutes 0
 ```
 
 This opens a Chromium window and waits. You sign in and start a duel; the bot
-takes over the moment it sees a question and plays until its limit.
+takes over the moment it sees a question and plays until the game's time limit.
 
 The bot never types your credentials and never accepts terms on your behalf.
 You log in once by hand; the session persists in `.browser-profile/`.
@@ -138,8 +136,8 @@ python -m matiks_bot.cli calibrate
 python -m matiks_bot.cli android --dry-run
 ```
 
-iOS is not supported. There is no way to inject taps into an iPhone without a
-jailbreak or a signed WebDriverAgent build.
+iOS is not supported. There is no way I could find to inject taps into an
+iPhone without a jailbreak or a signed WebDriverAgent build.
 
 ## Layout
 
@@ -166,9 +164,7 @@ python -m unittest discover -s tests -v
 48 tests. Almost every one exists because something failed against the live
 site first:
 
-- `1/6` — a progress counter that parsed as division
 - `Daily Challenges … 1/6` — a home-screen widget answered as a question
 - `Final score 21 - 18` — an end screen answered as subtraction, forever
 - a collapsed element box that turned `46 + 55` into `46 + 5`
 - a covered button that reported a successful click and started no game
-- percent questions silently dropped by an over-strict regex
