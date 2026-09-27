@@ -7,10 +7,13 @@ when the session expires.
 
 import pathlib
 import sys
+import time
 import unittest
+from unittest import mock
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
+from matiks_bot import browser_bot
 from matiks_bot.browser_bot import MatiksBrowserBot
 from matiks_bot.config import load_config
 
@@ -53,7 +56,33 @@ def make_bot(script, **run_overrides):
     return bot
 
 
+class FakeClock:
+    """Replaces the time module inside browser_bot so the retry waits cost nothing.
+
+    sleep() moves the clock forward instead of blocking. Every read of the clock also
+    moves it by a millisecond, so a deadline loop that never sleeps still ends.
+    """
+
+    def __init__(self):
+        self.now = time.monotonic()
+
+    def monotonic(self):
+        self.now += 0.001
+        return self.now
+
+    def sleep(self, seconds):
+        self.now += seconds
+
+    def __getattr__(self, name):
+        return getattr(time, name)
+
+
 class TestResilience(unittest.TestCase):
+    def setUp(self):
+        patcher = mock.patch.object(browser_bot, "time", FakeClock())
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_stops_when_the_window_is_closed(self):
         # Closing the browser is the documented way to end an open-ended run.
         def script(page):
